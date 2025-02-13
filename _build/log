@@ -1,0 +1,6 @@
+# dune init project rgxx
+# OCAMLPARAM: unset
+# Shared cache: enabled-except-user-rules
+# Shared cache location: /home/mira/.cache/dune/db
+# Workspace root: /home/mira/Documents/code/rgxx
+# Auto-detected concurrency: 16
