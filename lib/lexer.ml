@@ -74,7 +74,7 @@ let%test_module "Lexer tests" =
     ;;
 
     let%test "Lexer can parse a left parenthesis" =
-      next_token @@ test_lexer
+      next_token test_lexer
       = ({ test_lexer with position = 1; ch = Some 'a' }, Some LeftParen)
     ;;
 
