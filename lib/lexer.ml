@@ -57,9 +57,7 @@ let%test_module "Lexer tests" =
   (module struct
     (** Consumes a lexer, token pair to produce the next pair, discarding the 
     previous token. *)
-    let chomp = function
-      | lexer, _ -> next_token lexer
-    ;;
+    let chomp (lexer, _) = next_token lexer
 
     let test_lexer = init "(ab*+c)"
 
