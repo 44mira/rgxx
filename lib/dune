@@ -1,2 +1,5 @@
 (library
- (name rgxx))
+ (name rgxx)
+ (inline_tests)
+ (preprocess
+  (pps ppx_deriving.show ppx_inline_test)))
