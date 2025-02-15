@@ -52,17 +52,15 @@ and skip_whitespace lexer =
     lexer
 ;;
 
-(** Consumes a lexer, token pair to produce the next pair, discarding the 
-    previous token.
-
-    This is more or less just used for testing parsed tokens. *)
-let chomp = function
-  | lexer, _ -> next_token lexer
-;;
-
 (* Tests {{{*)
 let%test_module "Lexer tests" =
   (module struct
+    (** Consumes a lexer, token pair to produce the next pair, discarding the 
+    previous token. *)
+    let chomp = function
+      | lexer, _ -> next_token lexer
+    ;;
+
     let test_lexer = init "(ab*+c)"
 
     let%test "Lexer can initialize a non-empty string" =

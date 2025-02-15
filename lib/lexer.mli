@@ -5,7 +5,6 @@ type lexer
 
 val init : string -> lexer
 val next_token : lexer -> lexer * Token.token option
-val chomp : lexer * Token.token option -> lexer * Token.token option
 
 (** Pretty-printing *)
 
