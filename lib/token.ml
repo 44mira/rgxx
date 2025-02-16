@@ -25,7 +25,7 @@
   <LAMBDA>    ::= 'L'
  *)
 
-type token =
+type t =
   | Letter of char
   | LeftParen
   | RightParen

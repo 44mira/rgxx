@@ -1,4 +1,4 @@
-type lexer =
+type t =
   { input : string
   ; position : int
   ; ch : char option

@@ -1,12 +1,12 @@
 (** Abstract lexer type *)
-type lexer
+type t
 
 (** Public functions *)
 
-val init : string -> lexer
-val next_token : lexer -> lexer * Token.token option
+val init : string -> t
+val next_token : t -> t * Token.t option
 
 (** Pretty-printing *)
 
-val pp_lexer : Format.formatter -> lexer -> unit
-val show_lexer : lexer -> string
+val pp : Format.formatter -> t -> unit
+val show : t -> string
