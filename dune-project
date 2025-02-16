@@ -19,7 +19,7 @@
  (name rgxx)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml)
+ (depends ocaml sexplib)
  (tags
   ("add topics" "to describe" your project)))
 
