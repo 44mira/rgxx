@@ -43,6 +43,7 @@ and parse_primary parser =
   match parser.curr with
   | Some Lambda -> Ok (parser, Node.Lambda)
   | Some (Letter a) -> Ok (parser, Node.Letter a)
+  | Some LeftParen -> collect_group (advance parser)
   | _ -> Error "Invalid primary character."
 
 and collect_expression parser terms =
@@ -57,6 +58,12 @@ and collect_term parser units =
   match parse_unit' parser with
   | Ok (parser, unit') -> collect_term (advance parser) (unit' :: units)
   | Error _ -> parser, List.rev units
+
+and collect_group parser =
+  let* parser, expr = parse_expression parser in
+  match parser.curr with
+  | Some RightParen -> Ok (parser, Node.Group expr)
+  | _ -> Error "Invalid grouping."
 ;;
 
 (** Tests {{{*)
@@ -97,5 +104,87 @@ let%test "Parser can parse alternates" =
           ; Unit { primary = Letter 'a'; repeat = false }
           ]
       ]
+;;
+
+let%test "Parser can parse groups" =
+  iparse "(a* + b)"
+  = Expression
+      [ Term
+          [ Unit
+              { primary =
+                  Group
+                    (Expression
+                       [ Term [ Unit { primary = Letter 'a'; repeat = true } ]
+                       ; Term [ Unit { primary = Letter 'b'; repeat = false } ]
+                       ])
+              ; repeat = false
+              }
+          ]
+      ]
+;;
+
+let%test "Parser can parse groups as units" =
+  iparse "(ab + a) + a"
+  = Expression
+      [ Term
+          [ Unit
+              { primary =
+                  Group
+                    (Expression
+                       [ Term
+                           [ Unit { primary = Letter 'a'; repeat = false }
+                           ; Unit { primary = Letter 'b'; repeat = false }
+                           ]
+                       ; Term [ Unit { primary = Letter 'a'; repeat = false } ]
+                       ])
+              ; repeat = false
+              }
+          ]
+      ; Term [ Unit { primary = Letter 'a'; repeat = false } ]
+      ]
+;;
+
+let%test "Parser can parse groups as units and then repeat" =
+  iparse "(ab)* + a"
+  = Expression
+      [ Term
+          [ Unit
+              { primary =
+                  Group
+                    (Expression
+                       [ Term
+                           [ Unit { primary = Letter 'a'; repeat = false }
+                           ; Unit { primary = Letter 'b'; repeat = false }
+                           ]
+                       ])
+              ; repeat = true
+              }
+          ]
+      ; Term [ Unit { primary = Letter 'a'; repeat = false } ]
+      ]
+;;
+
+(*}}}*)
+
+(** Negative tests {{{*)
+
+let%test "Parser recognizes invalid expression `*`" =
+  iparse "*" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
+;;
+
+let%test "Parser recognizes invalid expression `**`" =
+  iparse "**" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
+;;
+
+let%test "Parser recognizes invalid expression `a(**)`" =
+  iparse "a(**)" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
+;;
+
+let%test "Parser recognizes invalid expression `a++`" =
+  iparse "a++" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
+;;
+
+let%test "Parser recognizes invalid expression `()`" =
+  iparse "()" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
 ;;
 (*}}}*)
