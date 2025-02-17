@@ -1,17 +1,17 @@
 open Sexplib.Std
 
-type expression =
-  | Term of term
-  | Alternate of
-      { lhs : expression
-      ; rhs : expression
+type expression = Expression of term list [@@deriving show { with_path = false }, sexp]
+and term = Term of unit' list [@@deriving show { with_path = false }, sexp]
+
+and unit' =
+  | Unit of
+      { primary : primary
+      ; repeat : bool
       }
 [@@deriving show { with_path = false }, sexp]
 
-and term =
+and primary =
   | Letter of char
-  | Concat of term list
-  | Group of expression
-  | Repeat of term
   | Lambda
+  | Group of expression
 [@@deriving show { with_path = false }, sexp]
