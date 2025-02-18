@@ -1,2 +1,3 @@
 profile = janestreet
 if-then-else = fit-or-vertical
+sequence-blank-line = preserve-one
