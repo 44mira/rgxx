@@ -21,7 +21,9 @@ let init lexer =
 
 let rec parse parser =
   let* parser, expr = parse_expression parser in
-  Ok (parser, expr)
+  match parser.curr with
+  | None -> Ok (parser, expr)
+  | _ -> Error "Did not reach end."
 
 and parse_expression parser =
   let* parser, term = parse_term parser in
@@ -55,8 +57,7 @@ and collect_expression parser terms =
 
 and collect_term parser units =
   match parser.curr with
-  | Some Star | Some Alternate | Some RightParen -> Ok (parser, List.rev units)
-  | None -> Ok (parser, List.rev units)
+  | Some Star | Some Alternate | Some RightParen | None -> Ok (parser, List.rev units)
   | _ ->
     let* parser, unit' = parse_unit' parser in
     collect_term (advance parser) (unit' :: units)
