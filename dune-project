@@ -5,22 +5,20 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github "44mira/rgxx"))
 
-(authors "Author Name <author@example.com>")
+(authors "Legolas Tyrael Lada")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers "Legolas Tyrael Lada")
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
+(documentation https://github.com/44mira/rgxx)
 
 (package
  (name rgxx)
- (synopsis "A short synopsis")
- (description "A longer description")
- (depends ocaml sexplib)
- (tags
-  ("add topics" "to describe" your project)))
+ (synopsis "A regex validator.")
+ (description "A regex validator in OCaml.")
+ (depends ocaml sexplib))
 
 ; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html
