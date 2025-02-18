@@ -25,12 +25,12 @@ let rec parse parser =
 
 and parse_expression parser =
   let* parser, term = parse_term parser in
-  let parser, terms = collect_expression parser [ term ] in
+  let* parser, terms = collect_expression parser [ term ] in
   Ok (parser, Node.Expression terms)
 
 and parse_term parser =
   let* parser, unit' = parse_unit' parser in
-  let parser, units = collect_term (advance parser) [ unit' ] in
+  let* parser, units = collect_term (advance parser) [ unit' ] in
   Ok (parser, Node.Term units)
 
 and parse_unit' parser =
@@ -49,15 +49,17 @@ and parse_primary parser =
 and collect_expression parser terms =
   match parser.curr with
   | Some Alternate ->
-    (match parse_term (advance parser) with
-     | Ok (parser, term) -> collect_expression parser (term :: terms)
-     | Error _ -> parser, List.rev terms)
-  | _ -> parser, List.rev terms
+    let* parser, term = parse_term (advance parser) in
+    collect_expression parser (term :: terms)
+  | _ -> Ok (parser, List.rev terms)
 
 and collect_term parser units =
-  match parse_unit' parser with
-  | Ok (parser, unit') -> collect_term (advance parser) (unit' :: units)
-  | Error _ -> parser, List.rev units
+  match parser.curr with
+  | Some Star | Some Alternate | Some RightParen -> Ok (parser, List.rev units)
+  | None -> Ok (parser, List.rev units)
+  | _ ->
+    let* parser, unit' = parse_unit' parser in
+    collect_term (advance parser) (unit' :: units)
 
 and collect_group parser =
   let* parser, expr = parse_expression parser in
@@ -186,5 +188,13 @@ let%test "Parser recognizes invalid expression `a++`" =
 
 let%test "Parser recognizes invalid expression `()`" =
   iparse "()" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
+;;
+
+let%test "Parser recognizes invalid expression `((`" =
+  iparse "((" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
+;;
+
+let%test "Parser recognizes invalid expression `a**`" =
+  iparse "a**" = Node.Expression [ Term [ Unit { primary = Lambda; repeat = false } ] ]
 ;;
 (*}}}*)
