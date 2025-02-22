@@ -27,10 +27,10 @@ and evaluate_term term evaluator =
   match term with
   | Term [] -> None (* For completeness, term list should never be empty *)
   | Term (h :: t) ->
+    let ( let* ) = Option.bind in
     let f acc unit' =
-      match acc with
-      | None -> None
-      | Some evaluator -> evaluate_unit unit' evaluator
+      let* evaluator = acc in
+      evaluate_unit unit' evaluator
     in
     List.fold_left f (evaluate_unit h evaluator) t
 
