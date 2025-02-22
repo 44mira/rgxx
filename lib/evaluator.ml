@@ -101,6 +101,11 @@ let%test_module "Evaluator tests" =
       && (not @@ eval p "abba")
     ;;
 
+    let%test "Evaluator can match on repeated letters 2" =
+      let p = "ab*a" in
+      eval p "abbba" && eval p "aba" && (not @@ eval p "abab")
+    ;;
+
     let%test "Evaluator can match alternated groups" =
       let p = "(ab) + a" in
       eval p "ab" && eval p "a" && (not @@ eval p "b") && (not @@ eval p "aa")
@@ -111,6 +116,16 @@ let%test_module "Evaluator tests" =
       let p = "(ab)*" in
       (for_all Fun.id @@ map (eval p) [ "ababab"; "abab"; "ab"; "" ])
       && (not @@ eval p "aba")
+    ;;
+
+    let%test "Evaluator can match repeating groups 2" =
+      let p = "a(a+b)*a" in
+      eval p "abbaba" && eval p "aaaa" && eval p "abba" && (not @@ eval p "bab")
+    ;;
+
+    let%test "Evaluator can match repeating groups non-greedily" =
+      let p = "aa*a" in
+      eval p "aaaa" && eval p "aa" && eval p "aaa"
     ;;
 
     let%test "Evaluator can match + lambda pattern" =
