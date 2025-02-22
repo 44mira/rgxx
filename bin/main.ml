@@ -21,6 +21,22 @@ let speclist =
 (** Parse arg specifications *)
 let () = Arg.parse speclist anon_fun usage_msg
 
+let validate_line ast idx line =
+  let open Evaluator in
+  let evaluator = init @@ String.trim line in
+  let result = evaluate ast evaluator in
+  if result then
+    Spectrum.Simple.printf
+      "@{<yellow,italic>TEST %d: @{<green,bold>PASS@}@} @{<dim>%s@}\n"
+      idx
+      line
+  else
+    Spectrum.Simple.printf
+      "@{<bg:black, yellow,italic>TEST %d: @{<red,underline,bold>FAIL@}@} @{<dim>%s@}\n"
+      idx
+      line
+;;
+
 (** Main *)
 let () =
   (* Check for file existence *)
@@ -31,9 +47,12 @@ let () =
   let parse pattern = Parser.(parse @@ init @@ Lexer.init pattern) in
   match parse !regex_pattern with
   | Error e -> raise @@ Invalid_pattern e
-  | Ok (_, _ast) ->
+  | Ok (_, ast) ->
     (* Evaluate each line of textfile with respect to the abstract syntax tree 
        from the regex pattern*)
     let inp = open_in !test_file in
-    List.iter print_endline @@ In_channel.input_lines inp
+    Spectrum.Simple.printf
+      " @{<dim>PATTERN =@} @{<yellow,bold>%s@}\n@{<black>::==::==::==::@}\n"
+      !regex_pattern;
+    In_channel.input_lines inp |> List.iteri (fun i x -> validate_line ast (i + 1) x)
 ;;
