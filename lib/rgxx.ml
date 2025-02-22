@@ -5,3 +5,4 @@ module Token = Token
 module Lexer = Lexer
 module Node = Node
 module Parser = Parser
+module Evaluator = Evaluator
